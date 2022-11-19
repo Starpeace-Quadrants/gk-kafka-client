@@ -6,6 +6,8 @@ import {ref} from "vue";
 let feedback = ref('')
 
 const callback = (response) => {
+  updateFeedback("Verifying Token")
+  updateFeedback(response.credential)
   // This callback will be triggered when the user selects or login to
   // his Google account from the popup
   fetch('http://localhost:3000/google/verify', {
