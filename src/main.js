@@ -5,7 +5,7 @@ import vue3GoogleLogin from 'vue3-google-login'
 const app = createApp(App)
 
 app.use(vue3GoogleLogin, {
-    clientId: '939293573845-e3e5t507011f13rid8ccu4iv4p6be2i8.apps.googleusercontent.com'
+    clientId: process.env.VUE_APP_GOOGLE_CLIENT_ID
 })
 
 app.mount('#app')
