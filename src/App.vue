@@ -10,7 +10,7 @@ const callback = (response) => {
   updateFeedback(response.credential)
   // This callback will be triggered when the user selects or login to
   // his Google account from the popup
-  fetch('http://localhost:3000/google/verify', {
+  fetch('https://localhost:3000/google/verify', {
     method: 'GET',
     headers: new Headers({
       'Authorization': 'Bearer ' + response.credential,
@@ -23,7 +23,7 @@ const callback = (response) => {
 function begin(sessionId) {
   updateFeedback('Opening socket')
 
-  let socket = new WebSocket("ws://localhost:8099/ws");
+  let socket = new WebSocket("wss://relay.localhost/ws");
   console.log(socket)
   updateFeedback('Socket open')
   socket.onopen = function () {
