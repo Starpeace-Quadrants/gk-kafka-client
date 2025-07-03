@@ -1,55 +1,69 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
-import {protocolMessage} from "@/composable/message_protocol";
-import {ref} from "vue";
+import { protocolMessage } from '@/composable/message_protocol'
+import { ref } from 'vue'
 
 let feedback = ref('')
 
-const callback = (response) => {
-  updateFeedback("Verifying Token")
-  updateFeedback(response.credential)
-  // This callback will be triggered when the user selects or login to
-  // his Google account from the popup
-  fetch('https://localhost:3000/google/verify', {
-    method: 'GET',
-    headers: new Headers({
-      'Authorization': 'Bearer ' + response.credential,
-      'Accept': 'application/json'
+const callback = async (response) => {
+  updateFeedback('Verifying token...')
+  try {
+    const res = await fetch('https://localhost:3000/google/verify', {
+      method: 'GET',
+      headers: new Headers({
+        Authorization: 'Bearer ' + response.credential,
+        Accept: 'application/json'
+      })
     })
-  }).then(response => response.json())
-      .then(json => begin(json.sessionId))
+
+    if (!res.ok) {
+      updateFeedback(`Token verification failed with status ${res.status}`)
+      return
+    }
+
+    const json = await res.json()
+    updateFeedback('Token verified')
+    begin(json.sessionId)
+  } catch (err) {
+    updateFeedback(`Token verification error: ${err}`)
+  }
 }
 
 function begin(sessionId) {
-  updateFeedback('Opening socket')
+  updateFeedback('Opening socket...')
 
-  let socket = new WebSocket("wss://relay.localhost/ws");
-  console.log(socket)
-  updateFeedback('Socket open')
+  let socket
+  try {
+    socket = new WebSocket('wss://relay.localhost/ws')
+  } catch (err) {
+    updateFeedback(`Failed to create WebSocket: ${err}`)
+    return
+  }
+
   socket.onopen = function () {
-    updateFeedback("Connection established");
-    updateFeedback("Sending to server");
-    let optional = {"sessionId": sessionId};
-    socket.send(protocolMessage('authentication', 'authenticate', optional));
-  };
+    updateFeedback('Connection established')
+    updateFeedback('Sending authentication to server')
+    const optional = { sessionId: sessionId }
+    socket.send(protocolMessage('authentication', 'authenticate', optional))
+  }
 
   socket.onmessage = function (event) {
-    updateFeedback(`Data received from server: ${event.data}`);
-  };
+    updateFeedback(`Data received from server: ${event.data}`)
+  }
 
   socket.onclose = function (event) {
     if (event.wasClean) {
-      updateFeedback(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+      updateFeedback(`Connection closed cleanly, code=${event.code} reason=${event.reason}`)
     } else {
       // e.g. server process killed or network down
       // event.code is usually 1006 in this case
-      updateFeedback('Connection died');
+      updateFeedback('Connection died')
     }
-  };
+  }
 
   socket.onerror = function (error) {
-    updateFeedback(`${error.value}`);
-  };
+    updateFeedback(`WebSocket error: ${error}`)
+  }
 }
 
 function updateFeedback(fb) {
