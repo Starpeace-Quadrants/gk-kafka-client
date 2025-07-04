@@ -8,7 +8,7 @@ let feedback = ref('')
 const callback = async (response) => {
   updateFeedback('Verifying token...')
   try {
-    const res = await fetch('https://localhost:3000/google/verify', {
+    const res = await fetch('https://auth.localhost/google/verify', {
       method: 'GET',
       headers: new Headers({
         Authorization: 'Bearer ' + response.credential,
