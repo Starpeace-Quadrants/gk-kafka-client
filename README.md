@@ -48,6 +48,6 @@ mkcert -install
 yarn mkcert
 ```
 
-The Dockerfile copies `certs/cert.pem` into the image and sets
-`NODE_EXTRA_CA_CERTS` so HTTPS requests trust the local development
-certificate.
+The Dockerfile expects certificates to be available under `/app/certs` at
+runtime and sets `NODE_EXTRA_CA_CERTS` to `/app/certs/cert.pem` so HTTPS
+requests trust the mounted certificate.
