@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "mkcert": "mkcert -cert-file certs/cert.pem -key-file certs/key.pem localhost 127.0.0.1 ::1"
   },
   "dependencies": {
     "core-js": "^3.8.3",
